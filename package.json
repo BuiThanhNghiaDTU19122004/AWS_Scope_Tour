@@ -4,10 +4,10 @@
   "description": "Bùi Thành Nghĩa\r Trần Quang Hiếu\r Huỳnh Đức Huy\r Võ Hùng Cường",
   "main": "index.js",
   "scripts": {
-    "start": "node LAB_2/src/server.js",
-    "worker": "node LAB_2/src/queue_worker.js",
-    "dev": "nodemon LAB_2/src/server.js",
-    "worker:dev": "nodemon LAB_2/src/queue_worker.js"
+    "start": "node BE/src/server.js",
+    "worker": "node BE/src/queue_worker.js",
+    "dev": "nodemon BE/src/server.js",
+    "worker:dev": "nodemon BE/src/queue_worker.js"
   },
   "repository": {
     "type": "git",

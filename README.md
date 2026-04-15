@@ -1,5 +1,16 @@
 # 🎯 Scope Tour - Task Management System
 
+## 🚀 Cập nhật cấu trúc FE/BE (AWS-ready)
+
+Repository đã được tách rõ:
+- FE: [FE](FE) (deploy lên S3/CloudFront)
+- BE: [BE](BE) (deploy lên EC2/ECS/App Runner)
+
+Tài liệu triển khai nhanh:
+- Checklist: [AWS_FE_BE_SPLIT_CHECKLIST.md](AWS_FE_BE_SPLIT_CHECKLIST.md)
+- BE env mẫu: [BE/.env.example](BE/.env.example)
+- FE runtime config: [FE/public/config.js](FE/public/config.js)
+
 ## 📋 Tổng Quan Dự Án
 
 **Scope Tour** là một ứng dụng quản lý task dành cho nhóm học tập/làm việc, cho phép người dùng tạo team, quản lý môn học (subjects), và theo dõi tiến độ công việc theo thời gian thực.

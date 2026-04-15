@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../public/css/chat.css">
+    <link rel="stylesheet" href="../public/css/main-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <title>Document</title>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="header-chat-box">
+            <div class="avatar-group">
+                <img src="../public/img/login/facebook.png" alt="" class="avatar">
+            </div>
+            <div class="name">Rhett Sanchez</div>
+
+            <div class="user-streak">
+                <img src="../public/img/list-team-goal/slider2.png" alt="" class="icon-streak">
+                <div class="number-streak">
+                  <span>30</span>
+                </div>
+            </div>
+            
+            <div class="close-icon"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+
+        <div class="chat-box" id="chatBox"></div>
+        <div class="input-container">
+            <input style="font-size: 14px;" type="text" id="messageInput" placeholder="Type a message...">
+            <button onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>  
+
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const closeIcon = document.querySelector(".close-icon");
+    const chatContainer = document.querySelector(".chat-container");
+    const messageInput = document.getElementById("messageInput");
+
+    // Sá»± kiá»‡n Ä‘Ã³ng cá»­a sá»• chat khi nháº¥n vÃ o icon Ä‘Ã³ng
+    closeIcon.addEventListener("click", function () {
+        chatContainer.style.display = "none"; 
+    });
+
+    // Sá»± kiá»‡n gá»­i tin nháº¯n khi báº¥m Enter
+    messageInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // NgÄƒn xuá»‘ng dÃ²ng trong Ã´ input
+            sendMessage();
+        }
+    });
+});
+
+function sendMessage() {
+    const input = document.getElementById("messageInput");
+    const chatBox = document.getElementById("chatBox");
+    const messageText = input.value.trim();
+
+    if (messageText !== "") {
+        // Táº¡o tin nháº¯n gá»­i Ä‘i
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("message", "sent");
+        messageElement.innerText = messageText;
+        chatBox.appendChild(messageElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        input.value = "";
+
+        // Giáº£ láº­p tin nháº¯n pháº£n há»“i tá»« ngÆ°á»i khÃ¡c sau 0.1 giÃ¢y
+        setTimeout(() => receiveMessage("Hello bro.", "Huy"), 100);
+    }
+}
+
+function receiveMessage(text, nameReceived = "User") {
+    const chatBox = document.getElementById("chatBox");
+
+    // Táº¡o container cho tin nháº¯n nháº­n Ä‘Æ°á»£c
+    const messageContainer = document.createElement("div");
+    messageContainer.classList.add("message-container");
+
+    // Táº¡o pháº§n hiá»ƒn thá»‹ tÃªn ngÆ°á»i gá»­i
+    const nameElement = document.createElement("p");
+    nameElement.classList.add("sender-name");
+    nameElement.innerText = nameReceived;
+
+    // Táº¡o ná»™i dung tin nháº¯n
+    const messageElement = document.createElement("div");
+    messageElement.classList.add("message", "received");
+    messageElement.innerText = text;
+
+    // Gáº¯n tÃªn ngÆ°á»i gá»­i + tin nháº¯n vÃ o container
+    messageContainer.appendChild(nameElement);
+    messageContainer.appendChild(messageElement);
+
+    // ThÃªm vÃ o khung chat
+    chatBox.appendChild(messageContainer);
+    chatBox.scrollTop = chatBox.scrollHeight; // Cuá»™n xuá»‘ng tin nháº¯n má»›i nháº¥t
+}
+
+</script>
+    <script src="../public/config.js"></script>
+</body>
+</html>
+
