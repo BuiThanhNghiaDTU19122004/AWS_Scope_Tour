@@ -85,7 +85,7 @@ class Sidebar extends HTMLElement {
                     </a>
                 </li>
                 <li data-id="log-out">
-                    <a href="log-out.html">
+                    <a href="#" data-action="logout">
                     <i class="fa-solid fa-right-from-bracket"></i>
                         <span>Log out</span>
                     </a>
@@ -95,6 +95,7 @@ class Sidebar extends HTMLElement {
         `;
 
         this.setActiveMenu();
+        this.bindLogoutAction();
     }
 
     setActiveMenu() {
@@ -102,7 +103,6 @@ class Sidebar extends HTMLElement {
         if (!activeMenu) return;
 
         const selectedItem = this.querySelector(`li[data-id="${activeMenu}"]`);
-
         if (selectedItem) {
             selectedItem.classList.add("active");
 
@@ -117,6 +117,24 @@ class Sidebar extends HTMLElement {
             //     }
             // }
         }
+    }
+
+    bindLogoutAction() {
+        const logoutLink = this.querySelector('[data-action="logout"]');
+        if (!logoutLink) return;
+
+        logoutLink.addEventListener("click", (event) => {
+            event.preventDefault();
+
+            const isConfirmed = window.confirm("Bạn có chắc muốn đăng xuất không?");
+            if (!isConfirmed) return;
+
+            localStorage.removeItem("user");
+            localStorage.removeItem("loggedInUser");
+            localStorage.removeItem("currentUserId");
+
+            window.location.href = "login-2.html";
+        });
     }
 }
 

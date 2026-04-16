@@ -6,6 +6,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const colors = ["#E08963", "#5E96AE", "#f15f0e", "#A2C139"];
     const urlParams = new URLSearchParams(window.location.search);
     const teamId = urlParams.get('teamId');
+
+    function showCreateSuccessPopup(message) {
+        if (typeof window.showModal === "function") {
+            window.showModal(message);
+            return;
+        }
+
+        alert(message);
+    }
+
     // Function to render subjects dynamically
     function renderSubjects(subjects, isSearch = false) {
         const subjectList = document.getElementById("SubjectList");
@@ -187,7 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
           const result = await response.json();
           if (response.ok) {
-            alert(result.message);
+                        showCreateSuccessPopup("Bạn đã tạo subject thành công!");
             const currentQuery = searchInput.value.trim();
             if (currentQuery) {
                 searchSubjects(currentQuery); // Refresh with current search query

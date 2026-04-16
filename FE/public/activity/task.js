@@ -785,7 +785,7 @@ const startDate = task.start_date ? DateUtils.formatDate(new Date(task.start_dat
         this.addOptimisticTask(optimisticTask);
         
         // Hiển thị thông báo thành công
-        showSuccessModal('Task created successfully!');
+        showSuccessModal('Bạn đã tạo task thành công!');
         
         // Gửi request tạo task
         const response = await API.createTask(taskData);
@@ -803,7 +803,7 @@ const startDate = task.start_date ? DateUtils.formatDate(new Date(task.start_dat
         
         // Nếu có lỗi, vẫn hiển thị thông báo thành công vì đã queue
         if (error.message.includes('Failed to fetch') || error.message.includes('Network')) {
-          showSuccessModal('Task created and will be synchronized when connection is restored!');
+          showSuccessModal('Bạn đã tạo task thành công! Hệ thống sẽ đồng bộ khi kết nối ổn định.');
         } else {
           showErrorModal('Failed to create task: ' + (error.message || error));
         }
