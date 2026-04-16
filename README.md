@@ -3,10 +3,12 @@
 ## 🚀 Cập nhật cấu trúc FE/BE (AWS-ready)
 
 Repository đã được tách rõ:
+
 - FE: [FE](FE) (deploy lên S3/CloudFront)
 - BE: [BE](BE) (deploy lên EC2/ECS/App Runner)
 
 Tài liệu triển khai nhanh:
+
 - Checklist: [AWS_FE_BE_SPLIT_CHECKLIST.md](AWS_FE_BE_SPLIT_CHECKLIST.md)
 - BE env mẫu: [BE/.env.example](BE/.env.example)
 - FE runtime config: [FE/public/config.js](FE/public/config.js)
@@ -16,6 +18,7 @@ Tài liệu triển khai nhanh:
 **Scope Tour** là một ứng dụng quản lý task dành cho nhóm học tập/làm việc, cho phép người dùng tạo team, quản lý môn học (subjects), và theo dõi tiến độ công việc theo thời gian thực.
 
 ### 👥 Thành viên nhóm
+
 - Bùi Thành Nghĩa
 - Trần Quang Hiếu
 - Huỳnh Đức Huy
@@ -27,15 +30,15 @@ Tài liệu triển khai nhanh:
 
 ### Technology Stack
 
-| Layer | Technology |
-|-------|------------|
-| **Backend** | Node.js + Express.js |
-| **Database** | MySQL (Sequelize ORM) |
-| **Cache** | Redis (Upstash) |
-| **Message Queue** | RabbitMQ (CloudAMQP) |
-| **Real-time** | Socket.IO |
-| **Email** | Nodemailer |
-| **Frontend** | HTML/CSS/JavaScript |
+| Layer             | Technology            |
+| ----------------- | --------------------- |
+| **Backend**       | Node.js + Express.js  |
+| **Database**      | MySQL (Sequelize ORM) |
+| **Cache**         | Redis (Upstash)       |
+| **Message Queue** | RabbitMQ (CloudAMQP)  |
+| **Real-time**     | Socket.IO             |
+| **Email**         | Nodemailer            |
+| **Frontend**      | HTML/CSS/JavaScript   |
 
 ### Kiến Trúc Tổng Quan
 
@@ -134,15 +137,16 @@ Tài liệu triển khai nhanh:
 ```
 
 **Chi tiết luồng:**
+
 1. **Client gửi request** tạo task qua REST API
 2. **Controller** nhận request, tạo optimistic response
 3. **TaskQueueService** đẩy message vào RabbitMQ queue
 4. **Queue Worker** consume message từ queue
 5. **TaskConsumer** xử lý:
-   - Kiểm tra database connection
-   - Lưu task vào MySQL
-   - Invalidate Redis cache
-   - Emit WebSocket event
+    - Kiểm tra database connection
+    - Lưu task vào MySQL
+    - Invalidate Redis cache
+    - Emit WebSocket event
 6. **Client** nhận real-time update qua Socket.IO
 
 ### 2. Luồng Cache với Redis
@@ -209,8 +213,8 @@ Tài liệu triển khai nhanh:
                      │    ┌─────────────────┐       │ end_date        │
                      │    │ TASK_COMPLETED  │       │ status          │
                      │    ├─────────────────┤       │ created_at      │
-                     │    │ id (PK)         │       └────────┬────────┘
-                     └───▶│ task_id (FK)    │◀───────────────┘
+                     └───▶│ id (PK)         │       └────────┬────────┘
+                          │ task_id (FK)    │◀───────────────┘
                           │ user_id (FK)    │
                           │ completed_date  │
                           └─────────────────┘
@@ -297,12 +301,14 @@ LAB_2/
 ## 🚀 Hướng Dẫn Cài Đặt
 
 ### Prerequisites
+
 - Node.js >= 18
 - MySQL
 - Redis (hoặc Upstash Redis)
 - RabbitMQ (hoặc CloudAMQP)
 
 ### Environment Variables (.env)
+
 ```env
 # Database
 DB_NAME=your_database
@@ -310,9 +316,6 @@ DB_USER=your_user
 DB_PASSWORD=your_password
 DB_HOST=your_host
 DB_PORT=3306
-
-# Redis
-REDIS_URL=rediss://your-redis-url
 
 # RabbitMQ
 RABBITMQ_URL=amqps://your-rabbitmq-url
@@ -322,6 +325,7 @@ JWT_SECRET=your_secret_key
 ```
 
 ### Installation
+
 ```bash
 # Clone repository
 git clone https://github.com/NagikoPokPok/Scope_Tour_Group2.git
@@ -344,26 +348,27 @@ npm run worker:dev
 
 ## 📡 API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/login` | User login |
-| POST | `/api/signup` | User registration |
-| GET | `/api/task` | Get tasks (với pagination, search, filter) |
-| POST | `/api/task` | Create new task |
-| PUT | `/api/task/:id` | Update task |
-| DELETE | `/api/task/:id` | Delete task |
-| POST | `/api/task/:id/submit` | Submit task |
-| GET | `/api/team` | Get teams |
-| POST | `/api/team` | Create team |
-| GET | `/api/subject` | Get subjects |
-| POST | `/api/subject` | Create subject |
-| POST | `/api/join` | Join team via invitation |
+| Method | Endpoint               | Description                                |
+| ------ | ---------------------- | ------------------------------------------ |
+| POST   | `/api/login`           | User login                                 |
+| POST   | `/api/signup`          | User registration                          |
+| GET    | `/api/task`            | Get tasks (với pagination, search, filter) |
+| POST   | `/api/task`            | Create new task                            |
+| PUT    | `/api/task/:id`        | Update task                                |
+| DELETE | `/api/task/:id`        | Delete task                                |
+| POST   | `/api/task/:id/submit` | Submit task                                |
+| GET    | `/api/team`            | Get teams                                  |
+| POST   | `/api/team`            | Create team                                |
+| GET    | `/api/subject`         | Get subjects                               |
+| POST   | `/api/subject`         | Create subject                             |
+| POST   | `/api/join`            | Join team via invitation                   |
 
 ---
 
 ## 🔮 Tính Năng Dự Định (Future)
 
 ### Phase 1: Enhanced Features
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  📱 Mobile Responsive Design                                │
@@ -374,6 +379,7 @@ npm run worker:dev
 ```
 
 ### Phase 2: Communication Features
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  💬 Real-time Team Chat                                     │
@@ -384,6 +390,7 @@ npm run worker:dev
 ```
 
 ### Phase 3: Advanced Features
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  🐾 Gamification System (Pets, Streaks, Rewards)            │
@@ -394,6 +401,7 @@ npm run worker:dev
 ```
 
 ### Planned Architecture Improvements
+
 ```
 ┌───────────────────────────────────────────────────────────────────────────┐
 │                        FUTURE ARCHITECTURE                                │
@@ -416,21 +424,25 @@ npm run worker:dev
 ## 🔧 Key Design Patterns
 
 ### 1. **Message Queue Pattern**
+
 - Asynchronous task processing
 - Database resilience (auto-retry khi DB offline)
 - Dead Letter Queue cho error handling
 
 ### 2. **Cache-Aside Pattern**
+
 - Redis caching với TTL
 - Cache warming on startup
 - Automatic cache invalidation
 
 ### 3. **Optimistic UI Updates**
+
 - Immediate UI feedback
 - Background synchronization
 - Eventual consistency
 
 ### 4. **Event-Driven Architecture**
+
 - Real-time updates via WebSocket
 - Pub/Sub pattern cho task events
 - Room-based notifications

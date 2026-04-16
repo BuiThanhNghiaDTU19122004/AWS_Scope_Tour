@@ -2,7 +2,6 @@ const rabbitmqClient = require('../utils/rabbitmq_client');
 const { QUEUES } = require('../config/rabbitmq');
 const taskService = require('../services/task_service');
 const TaskCompleted = require('../models/TaskCompleted');
-const redisClient = require('../utils/redis_client');
 const sequelize = require('../config/database');
 const websocketHandler = require('../utils/websocket_handler');
 
@@ -214,9 +213,6 @@ class TaskConsumer {
     try {
       const task = await taskService.createTask(taskData);
       
-      // Invalidate cache after successful creation
-      await this.invalidateTaskCache(task.team_id, task.subject_id);
-      
       // Emit WebSocket event
       console.log('📡 Emitting task:created event for:', {
         teamId: task.team_id,
@@ -241,7 +237,6 @@ class TaskConsumer {
     const task = await taskService.updateTask(data.taskId, data.updateData);
     
     if (task) {
-      await this.invalidateTaskCache(task.team_id, task.subject_id);
       websocketHandler.emitTaskUpdated(task.team_id, task.subject_id, task);
     }
     
@@ -254,7 +249,6 @@ class TaskConsumer {
     const result = await taskService.deleteTask(data.taskId);
     
     if (result) {
-      await this.invalidateTaskCache(result.team_id, result.subject_id);
       websocketHandler.emitTaskDeleted(result.team_id, result.subject_id, data.taskId);
     }
     
@@ -284,40 +278,14 @@ class TaskConsumer {
       completed_date: new Date()
     });
 
-    await this.invalidateTaskCache(task.team_id, task.subject_id);
     websocketHandler.emitTaskSubmitted(task.team_id, task.subject_id, data.taskId, data.userId);
 
     console.log('✅ Task submitted successfully');
     return submission;
   }
 
-  async handleCacheInvalidation(data) {
-    console.log('🗑️ Invalidating cache keys:', data.cacheKeys);
-    
-    if (redisClient.isReady) {
-      for (const key of data.cacheKeys) {
-        await redisClient.del(key);
-      }
-      console.log('✅ Cache invalidated successfully');
-    } else {
-      console.log('⚠️ Redis not available, skipping cache invalidation');
-    }
-  }
-
-  async invalidateTaskCache(teamId, subjectId) {
-    if (redisClient.isReady) {
-      const pattern = `tasks:${subjectId}:${teamId}:*`;
-      
-      try {
-        for await (const key of redisClient.scanIterator(pattern)) {
-          await redisClient.del(key);
-        }
-        console.log('✅ Task cache invalidated for team:', teamId, 'subject:', subjectId);
-      } catch (error) {
-        console.error('❌ Error invalidating task cache:', error);
-      }
-    }
-  }
+  // Xóa phương thức handleCacheInvalidation
+  // Xóa phương thức invalidateTaskCache
 
   // Thêm phương thức startRetryCleanup
   startRetryCleanup() {

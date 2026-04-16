@@ -1,39 +1,38 @@
 {
-  "name": "scope_tour_group2",
-  "version": "1.0.0",
-  "description": "Bùi Thành Nghĩa\r Trần Quang Hiếu\r Huỳnh Đức Huy\r Võ Hùng Cường",
-  "main": "index.js",
-  "scripts": {
-    "start": "node BE/src/server.js",
-    "worker": "node BE/src/queue_worker.js",
-    "dev": "nodemon BE/src/server.js",
-    "worker:dev": "nodemon BE/src/queue_worker.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/NagikoPokPok/Scope_Tour_Group2.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/NagikoPokPok/Scope_Tour_Group2/issues"
-  },
-  "homepage": "https://github.com/NagikoPokPok/Scope_Tour_Group2#readme",
-  "dependencies": {
-    "@faker-js/faker": "^9.8.0",
-    "amqplib": "^0.10.8",
-    "bcryptjs": "^3.0.2",
-    "cors": "^2.8.5",
-    "dotenv": "^17.0.0",
-    "express": "^5.1.0",
-    "mysql2": "^3.14.1",
-    "nodemailer": "^7.0.4",
-    "redis": "^5.5.6",
-    "sequelize": "^6.37.7",
-    "socket.io": "^4.8.1"
-  },
-  "devDependencies": {
-    "sequelize-cli": "^6.6.3"
-  }
+    "name": "scope_tour_group2",
+    "version": "1.0.0",
+    "description": "Bùi Thành Nghĩa\r Trần Quang Hiếu\r Huỳnh Đức Huy\r Võ Hùng Cường",
+    "main": "index.js",
+    "scripts": {
+        "start": "node BE/src/server.js",
+        "worker": "node BE/src/queue_worker.js",
+        "dev": "nodemon BE/src/server.js",
+        "worker:dev": "nodemon BE/src/queue_worker.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/NagikoPokPok/Scope_Tour_Group2.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/NagikoPokPok/Scope_Tour_Group2/issues"
+    },
+    "homepage": "https://github.com/NagikoPokPok/Scope_Tour_Group2#readme",
+    "dependencies": {
+        "@faker-js/faker": "^9.8.0",
+        "amqplib": "^0.10.8",
+        "bcryptjs": "^3.0.2",
+        "cors": "^2.8.5",
+        "dotenv": "^17.0.0",
+        "express": "^5.1.0",
+        "mysql2": "^3.14.1",
+        "nodemailer": "^7.0.4",
+        "sequelize": "^6.37.7",
+        "socket.io": "^4.8.1"
+    },
+    "devDependencies": {
+        "sequelize-cli": "^6.6.3"
+    }
 }
