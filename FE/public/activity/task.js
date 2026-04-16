@@ -474,7 +474,7 @@ const startDate = task.start_date ? DateUtils.formatDate(new Date(task.start_dat
         const { tasks } = await API.searchTasks(query);
         this.renderTasks(tasks, "all");
       } catch (error) {
-        alert("Failed to search tasks");
+        showErrorModal("Failed to search tasks");
       }
     },
     renderTasks(tasks, taskType) {
@@ -646,8 +646,10 @@ const startDate = task.start_date ? DateUtils.formatDate(new Date(task.start_dat
 
     async handleTaskSubmission(taskId) {
     try {
-        // Show confirmation dialog
-      const confirmed = confirm("Are you sure you want to submit this task?");
+      const confirmed = await this.showConfirmationModal(
+        "Are you sure you want to submit this task?",
+        "Submit Task"
+      );
       if (!confirmed) return;
 
       // Lấy user_id từ session hoặc localStorage, hoặc dùng default
@@ -655,10 +657,10 @@ const startDate = task.start_date ? DateUtils.formatDate(new Date(task.start_dat
       
       await API.submitTask(taskId, userId);
 
-      alert("Task submitted successfully!");
+      showSuccessModal("Task submitted successfully!");
       await this.loadTasks();
     } catch (error) {
-      alert("Failed to submit task: " + error.message);
+      showErrorModal("Failed to submit task: " + error.message);
 
       // Lưu vào localStorage nếu lỗi mạng
       if (!navigator.onLine) {
@@ -669,23 +671,26 @@ const startDate = task.start_date ? DateUtils.formatDate(new Date(task.start_dat
           timestamp: Date.now()
         });
         localStorage.setItem("pendingTaskSubmits", JSON.stringify(pendingSubmits));
-        alert("Task submission saved locally. It will be retried when you are online.");
+        showSuccessModal("Task submission saved locally. It will be retried when you are online.");
       }
     }
   },
 
     async handleTaskDeletion(taskId) {
       try {
-        const confirmed = confirm("Are you sure you want to delete this task?");
+        const confirmed = await this.showConfirmationModal(
+          "Are you sure you want to delete this task?",
+          "Delete Task"
+        );
         if (!confirmed) return;
 
         await API.deleteTask(taskId);
-        alert("Task deleted successfully!");
+        showSuccessModal("Task deleted successfully!");
         
         // Thêm tham số skipCache=true để không lấy dữ liệu từ cache
         await this.loadTasks(currentPageAvailable, currentPageSubmitted, true);
       } catch (error) {
-        alert("Failed to delete task: " + error.message);
+        showErrorModal("Failed to delete task: " + error.message);
       }
     },
 
@@ -715,7 +720,7 @@ const startDate = task.start_date ? DateUtils.formatDate(new Date(task.start_dat
       
     } catch (error) {
       console.error("Error loading task for edit:", error);
-      alert("Failed to load task details: " + error.message);
+      showErrorModal("Failed to load task details: " + error.message);
     }
   },
 
@@ -1293,12 +1298,12 @@ async handleCreateTaskSubmission() {
 
   // Validation
   if (!title) {
-    alert("Please enter a title.");
+    showErrorModal("Please enter a title.", "Validation Error");
     return;
   }
 
   if (!timeRangeStr) {
-    alert("Please select a date and time.");
+    showErrorModal("Please select a date and time.", "Validation Error");
     return;
   }
 
@@ -1339,12 +1344,12 @@ async handleCreateTaskSubmission() {
     }
   } catch (error) {
     console.error("Date parsing error:", error);
-    alert("Invalid date/time format. Please check your input.");
+    showErrorModal("Invalid date/time format. Please check your input.", "Validation Error");
     return;
   }
 
   if (!startDateISO || !endDateISO) {
-    alert("Please provide valid start and end dates.");
+    showErrorModal("Please provide valid start and end dates.", "Validation Error");
     return;
   }
 
@@ -1355,19 +1360,19 @@ async handleCreateTaskSubmission() {
     const startDateOnly = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
     
     if (startDateOnly < currentDateOnly) {
-      alert("Start date cannot be in the past. Please select a current or future date.");
+      showErrorModal("Start date cannot be in the past. Please select a current or future date.", "Validation Error");
       return;
     }
     
     if (startDateOnly.getTime() === currentDateOnly.getTime()) {
       if (startDate < now) {
-        alert("Start time cannot be in the past. Please select a current or future time.");
+        showErrorModal("Start time cannot be in the past. Please select a current or future time.", "Validation Error");
         return;
       }
     }
 
     if (new Date(endDateISO) <= new Date(startDateISO)) {
-      alert("End date must be after start date.");
+      showErrorModal("End date must be after start date.", "Validation Error");
       return;
     }
 
@@ -1382,7 +1387,7 @@ async handleCreateTaskSubmission() {
     };
 
     if (!payload.subject_id || !payload.team_id) {
-      alert("Missing subject or team information.");
+      showErrorModal("Missing subject or team information.", "Validation Error");
       return;
     }
 
@@ -1392,7 +1397,7 @@ async handleCreateTaskSubmission() {
       await TaskManager.createTask(payload);
     } catch (error) {
       console.error("Task creation error:", error);
-      alert("Failed to create task: " + (error.message || error));
+      showErrorModal("Failed to create task: " + (error.message || error));
     }
   },
 
@@ -1409,12 +1414,12 @@ async handleCreateTaskSubmission() {
 
     // Validation
     if (!taskId) {
-      alert("Task ID is missing.");
+      showErrorModal("Task ID is missing.", "Validation Error");
       return;
     }
 
     if (!title) {
-      alert("Please enter a title.");
+      showErrorModal("Please enter a title.", "Validation Error");
       return;
     }
 
@@ -1461,13 +1466,13 @@ async handleCreateTaskSubmission() {
         }
       } catch (error) {
         console.error("Date parsing error:", error);
-        alert("Invalid date/time format. Please check your input.");
+        showErrorModal("Invalid date/time format. Please check your input.", "Validation Error");
         return;
       }
 
       // Validate that end date is after start date
       if (startDateISO && endDateISO && new Date(endDateISO) <= new Date(startDateISO)) {
-        alert("End date must be after start date.");
+        showErrorModal("End date must be after start date.", "Validation Error");
         return;
       }
     }
@@ -1486,10 +1491,10 @@ async handleCreateTaskSubmission() {
 
     try {
       await TaskManager.updateTask(taskId, payload);
-      alert("Task updated successfully!");
+      showSuccessModal("Task updated successfully!");
     } catch (error) {
       console.error("Task update error:", error);
-      alert("Failed to update task: " + (error.message || error));
+      showErrorModal("Failed to update task: " + (error.message || error));
     }
   }
 };

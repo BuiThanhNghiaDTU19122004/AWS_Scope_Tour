@@ -109,69 +109,7 @@
   <script src="../js/component.js"></script>
   <script src="../public/config.js"></script>
   <script type="module" src="../public/activity/time.js"></script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const userNameEl = document.getElementById("user_name");
-      const displayNameEl = document.getElementById("profile-display-name");
-      const displayEmailEl = document.getElementById("profile-display-email");
-      const nameInput = document.getElementById("profile-name");
-      const emailInput = document.getElementById("profile-email");
-      const imageInput = document.getElementById("profile-image-input");
-      const imagePreview = document.getElementById("profile-image-preview");
-      const resetButton = document.getElementById("reset-profile-btn");
-
-      let originalData = {
-        name: "",
-        email: "",
-        phone: "",
-        bio: ""
-      };
-
-      try {
-        const rawUser = localStorage.getItem("user");
-        if (rawUser) {
-          const user = JSON.parse(rawUser);
-          const displayName = user.name || user.user_name || user.username || "User";
-          const displayEmail = user.email || "user@email.com";
-
-          originalData.name = displayName;
-          originalData.email = displayEmail;
-
-          userNameEl.textContent = displayName;
-          displayNameEl.textContent = displayName;
-          displayEmailEl.textContent = displayEmail;
-
-          nameInput.value = displayName;
-          emailInput.value = displayEmail;
-        }
-      } catch (error) {
-        console.error("Failed to load user profile data:", error);
-      }
-
-      imageInput.addEventListener("change", function (event) {
-        const file = event.target.files && event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          imagePreview.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-
-      resetButton.addEventListener("click", function () {
-        nameInput.value = originalData.name;
-        emailInput.value = originalData.email;
-        document.getElementById("profile-phone").value = originalData.phone;
-        document.getElementById("profile-bio").value = originalData.bio;
-      });
-
-      document.getElementById("profile-form").addEventListener("submit", function (event) {
-        event.preventDefault();
-        alert("Profile changes have been saved successfully!");
-      });
-    });
-  </script>
+  <script src="../public/activity/user_profile_activity.js"></script>
+  <div id="modal-status-action-container"></div>
 </body>
 </html>

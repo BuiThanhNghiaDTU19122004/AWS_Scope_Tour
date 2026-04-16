@@ -1,7 +1,31 @@
 const UserService = require("../services/user_service");
 const { sendOTPEmail, generateOTP } = require("../services/email_service");
+const { uploadBufferToCloudinary } = require("../utils/cloudinary_client");
 
 class UserController {
+    static buildProfilePayload(body, userImgUrl) {
+        const payload = {};
+
+        const userName = body.user_name ?? body.userName;
+        const email = body.email;
+        const phoneNumber = body.phone_number ?? body.phoneNumber;
+
+        if (typeof userName === "string" && userName.trim()) {
+            payload.user_name = userName.trim();
+        }
+        if (typeof email === "string" && email.trim()) {
+            payload.email = email.trim();
+        }
+        if (typeof phoneNumber === "string") {
+            payload.phone_number = phoneNumber.trim();
+        }
+        if (typeof userImgUrl === "string" && userImgUrl.trim()) {
+            payload.user_img = userImgUrl;
+        }
+
+        return payload;
+    }
+
     // API lấy thông tin người dùng
     static async getUser(req, res) {
         console.log("Dữ liệu nhận được:", req.body);
@@ -14,6 +38,26 @@ class UserController {
             res.json({ success: true, user });
         } catch (error) {
             res.status(500).json({ success: false, message: "Lỗi server!" });
+        }
+    }
+
+    static async getProfileById(req, res) {
+        try {
+            const bodyUserId = req.body && req.body.userId;
+            const userId = Number(req.params.userId || bodyUserId);
+            if (!userId) {
+                return res.status(400).json({ success: false, message: "Thiếu userId hợp lệ!" });
+            }
+
+            const user = await UserService.getProfileById(userId);
+            if (!user) {
+                return res.status(404).json({ success: false, message: "Người dùng không tồn tại!" });
+            }
+
+            res.json({ success: true, user });
+        } catch (error) {
+            console.error("Lỗi tải hồ sơ:", error);
+            res.status(500).json({ success: false, message: "Lỗi server khi tải hồ sơ!" });
         }
     }
 
@@ -62,15 +106,46 @@ class UserController {
     //API cập nhật thông tin cá nhân
     static async updateProfile(req, res){
         try {
-            const { userId, userName, image} = req.body;
-            const success = await UserService.updateProfile(userId, userName, image);
-
-            if(success){
-                res.json({success: true, message: "Đã cập nhật hồ sơ thành công"});
-            } else {
-                res.status(400).json({ success: false, message: "Không thể cập nhật hồ sơ!" });
+            const bodyUserId = req.body && req.body.userId;
+            const userId = Number(req.params.userId || bodyUserId);
+            if (!userId) {
+                return res.status(400).json({ success: false, message: "Thiếu userId hợp lệ!" });
             }
+
+            const existingUser = await UserService.getProfileById(userId);
+            if (!existingUser) {
+                return res.status(404).json({ success: false, message: "Người dùng không tồn tại!" });
+            }
+
+            let imageUrl;
+            if (req.file && req.file.buffer) {
+                try {
+                    const uploadResult = await uploadBufferToCloudinary(req.file.buffer);
+                    imageUrl = uploadResult.secure_url;
+                } catch (uploadError) {
+                    console.error("Lỗi upload ảnh Cloudinary:", uploadError);
+                    return res.status(500).json({
+                        success: false,
+                        message: "Không thể upload ảnh. Vui lòng cấu hình Cloudinary và thử lại."
+                    });
+                }
+            }
+
+            const payload = UserController.buildProfilePayload(req.body, imageUrl);
+            if (Object.keys(payload).length === 0) {
+                return res.status(400).json({ success: false, message: "Không có dữ liệu hợp lệ để cập nhật." });
+            }
+
+            await UserService.updateProfile(userId, payload);
+            const updatedUser = await UserService.getProfileById(userId);
+
+            res.json({
+                success: true,
+                message: "Đã cập nhật hồ sơ thành công",
+                user: updatedUser
+            });
         } catch (error) {
+            console.error("Lỗi cập nhật hồ sơ:", error);
             res.status(500).json({ success: false, message: "Lỗi server!" });
         }
     }

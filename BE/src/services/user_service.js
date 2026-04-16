@@ -2,6 +2,15 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
+const PROFILE_ATTRIBUTES = [
+    "user_id",
+    "user_name",
+    "email",
+    "phone_number",
+    "user_img",
+    "created_at"
+];
+
 class UserService {
     // Lấy thông tin người dùng bằng Email
     static async getUserByEmail(email) {
@@ -19,6 +28,17 @@ class UserService {
             return await User.findByPk(userId);
         } catch (error) {
             console.error("Lỗi khi lấy người dùng theo ID:", error);
+            throw error;
+        }
+    }
+
+    static async getProfileById(userId) {
+        try {
+            return await User.findByPk(userId, {
+                attributes: PROFILE_ATTRIBUTES
+            });
+        } catch (error) {
+            console.error("Lỗi khi lấy hồ sơ người dùng theo ID:", error);
             throw error;
         }
     }
@@ -47,12 +67,40 @@ class UserService {
     }
 
     // Cập nhật profile cho người dùng
-    static async updateProfile(userId, name, image) {
+    static async updateProfile(userId, profileDataOrName, image) {
         try {
-            const [updated] = await User.update({ user_name: name, user_image: image}, { where: { user_id: userId } });
+            const updateData = {};
+
+            if (typeof profileDataOrName === "object" && profileDataOrName !== null) {
+                if (profileDataOrName.user_name !== undefined) {
+                    updateData.user_name = profileDataOrName.user_name;
+                }
+                if (profileDataOrName.email !== undefined) {
+                    updateData.email = profileDataOrName.email;
+                }
+                if (profileDataOrName.phone_number !== undefined) {
+                    updateData.phone_number = profileDataOrName.phone_number;
+                }
+                if (profileDataOrName.user_img !== undefined) {
+                    updateData.user_img = profileDataOrName.user_img;
+                }
+            } else {
+                if (profileDataOrName !== undefined) {
+                    updateData.user_name = profileDataOrName;
+                }
+                if (image !== undefined) {
+                    updateData.user_img = image;
+                }
+            }
+
+            if (Object.keys(updateData).length === 0) {
+                return false;
+            }
+
+            const [updated] = await User.update(updateData, { where: { user_id: userId } });
             return updated > 0; // Trả về true nếu cập nhật thành công
         } catch (error) {
-            console.error("Lỗi khi cập nhật mật khẩu:", error);
+            console.error("Lỗi khi cập nhật hồ sơ:", error);
             throw error;
         }
     }

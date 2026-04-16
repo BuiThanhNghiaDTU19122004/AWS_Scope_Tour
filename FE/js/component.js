@@ -123,10 +123,10 @@ class Sidebar extends HTMLElement {
         const logoutLink = this.querySelector('[data-action="logout"]');
         if (!logoutLink) return;
 
-        logoutLink.addEventListener("click", (event) => {
+        logoutLink.addEventListener("click", async (event) => {
             event.preventDefault();
 
-            const isConfirmed = window.confirm("Bạn có chắc muốn đăng xuất không?");
+            const isConfirmed = await this.showLogoutConfirmationModal();
             if (!isConfirmed) return;
 
             localStorage.removeItem("user");
@@ -134,6 +134,73 @@ class Sidebar extends HTMLElement {
             localStorage.removeItem("currentUserId");
 
             window.location.href = "login.html";
+        });
+    }
+
+    showLogoutConfirmationModal() {
+        return new Promise((resolve) => {
+            if (typeof bootstrap === "undefined") {
+                resolve(true);
+                return;
+            }
+
+            const existingModal = document.getElementById("logout-confirm-modal");
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            const modalWrapper = document.createElement("div");
+            modalWrapper.innerHTML = `
+                <div class="modal fade" id="logout-confirm-modal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Confirm Logout</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="mb-0">Bạn có chắc muốn đăng xuất không?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="logout-cancel-btn">Cancel</button>
+                                <button type="button" class="btn btn-primary" id="logout-confirm-btn">Logout</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modalWrapper.firstElementChild);
+
+            const modalElement = document.getElementById("logout-confirm-modal");
+            const bsModal = new bootstrap.Modal(modalElement);
+            let isResolved = false;
+
+            const cleanup = () => {
+                modalElement.remove();
+            };
+
+            const finalize = (value) => {
+                if (isResolved) return;
+                isResolved = true;
+                resolve(value);
+            };
+
+            document.getElementById("logout-confirm-btn").addEventListener("click", () => {
+                finalize(true);
+                bsModal.hide();
+            });
+
+            document.getElementById("logout-cancel-btn").addEventListener("click", () => {
+                finalize(false);
+            });
+
+            modalElement.addEventListener("hidden.bs.modal", () => {
+                finalize(false);
+                cleanup();
+            });
+
+            bsModal.show();
         });
     }
 }
