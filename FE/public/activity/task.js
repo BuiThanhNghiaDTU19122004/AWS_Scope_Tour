@@ -784,8 +784,8 @@ const startDate = task.start_date ? DateUtils.formatDate(new Date(task.start_dat
         // Thêm task vào UI ngay lập tức
         this.addOptimisticTask(optimisticTask);
         
-        // Hiển thị thông báo thành công
-        showSuccessModal('Bạn đã tạo task thành công!');
+        // Hiển thị thông báo thành công với cùng modal như create subject
+        showTaskCreatePopup('You created a task successfully!');
         
         // Gửi request tạo task
         const response = await API.createTask(taskData);
@@ -803,7 +803,7 @@ const startDate = task.start_date ? DateUtils.formatDate(new Date(task.start_dat
         
         // Nếu có lỗi, vẫn hiển thị thông báo thành công vì đã queue
         if (error.message.includes('Failed to fetch') || error.message.includes('Network')) {
-          showSuccessModal('Bạn đã tạo task thành công! Hệ thống sẽ đồng bộ khi kết nối ổn định.');
+          showTaskCreatePopup('You created a task successfully! It will sync once connection is stable.');
         } else {
           showErrorModal('Failed to create task: ' + (error.message || error));
         }
@@ -1581,4 +1581,13 @@ function showSuccessModal(message, title = 'Success!') {
   document.getElementById('modal-success-notification').addEventListener('hidden.bs.modal', function () {
     modalContainer.innerHTML = '';
   });
+}
+
+function showTaskCreatePopup(message) {
+  if (typeof window.showModal === "function") {
+    window.showModal(message);
+    return;
+  }
+
+  showSuccessModal(message);
 }

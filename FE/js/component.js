@@ -133,7 +133,7 @@ class Sidebar extends HTMLElement {
             localStorage.removeItem("loggedInUser");
             localStorage.removeItem("currentUserId");
 
-            window.location.href = "login-2.html";
+            window.location.href = "login.html";
         });
     }
 }

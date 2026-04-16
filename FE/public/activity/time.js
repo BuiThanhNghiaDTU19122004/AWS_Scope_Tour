@@ -1,4 +1,29 @@
 document.addEventListener('DOMContentLoaded', function () {
+    function getCurrentUserDisplayName() {
+      try {
+        const rawUser = localStorage.getItem('user');
+        if (!rawUser) return "";
+
+        const user = JSON.parse(rawUser);
+        if (!user || typeof user !== 'object') return "";
+
+        return user.name || user.user_name || user.username || user.email || "";
+      } catch (error) {
+        console.error('Failed to parse user from localStorage:', error);
+        return "";
+      }
+    }
+
+    function updateHeaderUserName() {
+      const displayName = getCurrentUserDisplayName();
+      if (!displayName) return;
+
+      const userNameElements = document.querySelectorAll('.header-user .user-name h3, #user_name');
+      userNameElements.forEach((element) => {
+        element.textContent = displayName;
+      });
+    }
+
     function updateTime() {
       const now = new Date();
       let hours = now.getHours();
@@ -17,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     // Update immediately, then every second
+    updateHeaderUserName();
     updateTime();
     setInterval(updateTime, 1000);
 
