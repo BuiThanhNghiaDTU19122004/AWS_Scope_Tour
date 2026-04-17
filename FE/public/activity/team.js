@@ -2,9 +2,15 @@ let currentPage = 1;
 let teamsPerPage = 5;
 let totalPages = 1;
 let currentSearchQuery = "";
+const isLocalHost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+const fallbackApiBaseUrl = isLocalHost
+    ? "http://localhost:3000/api"
+    : `${window.location.origin}/api`;
 const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL)
     || window.BASE_URL
-    || "http://localhost:3000/api";
+    || fallbackApiBaseUrl;
 
 document.addEventListener('DOMContentLoaded', function () {
   const colors = ['#E08963', '#5E96AE', '#f15f0e', '#A2C139']; // Màu luân phiên

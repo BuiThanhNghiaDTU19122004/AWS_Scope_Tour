@@ -1,7 +1,14 @@
+const isLocalHost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+const fallbackApiBaseUrl = isLocalHost
+    ? "http://localhost:3000/api"
+    : `${window.location.origin}/api`;
+
 document.addEventListener("DOMContentLoaded", function () {
     const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL)
         || window.BASE_URL
-        || "http://localhost:3000/api";
+        || fallbackApiBaseUrl;
 
     const colors = ["#E08963", "#5E96AE", "#f15f0e", "#A2C139"];
     const urlParams = new URLSearchParams(window.location.search);

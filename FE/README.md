@@ -12,15 +12,13 @@
 
 ## API/Socket runtime config
 Edit `public/config.js` before deploying:
-- `window.APP_CONFIG.API_BASE_URL`
-- `window.APP_CONFIG.SOCKET_BASE_URL`
+- `deployApiBaseUrl`
+- `deploySocketBaseUrl`
 
 Example:
 ```js
-window.APP_CONFIG = {
-    API_BASE_URL: "https://api.your-domain.com/api",
-    SOCKET_BASE_URL: "https://api.your-domain.com"
-};
+const deployApiBaseUrl = "https://api.your-domain.com/api";
+const deploySocketBaseUrl = "https://api.your-domain.com";
 ```
 
 ## Notes

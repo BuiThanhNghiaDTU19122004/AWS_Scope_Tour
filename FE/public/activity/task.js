@@ -2,12 +2,21 @@ let currentPageAvailable = 1;
 let currentPageSubmitted = 1;
 let tasksPerPage = 5;
 let socket = null;
+const isLocalHost =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+const fallbackApiBaseUrl = isLocalHost
+  ? "http://localhost:3000/api"
+  : `${window.location.origin}/api`;
+const fallbackSocketBaseUrl = isLocalHost
+  ? "http://localhost:3000"
+  : window.location.origin;
 const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL)
   || window.BASE_URL
-  || "http://localhost:3000/api";
+  || fallbackApiBaseUrl;
 const SOCKET_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.SOCKET_BASE_URL)
   || window.SOCKET_URL
-  || "http://localhost:3000";
+  || fallbackSocketBaseUrl;
 
 // ===================== ĐỊNH NGHĨA SHOWNOTIFICATION TRƯỚC ======================
 function showNotification(message, type = 'info') {

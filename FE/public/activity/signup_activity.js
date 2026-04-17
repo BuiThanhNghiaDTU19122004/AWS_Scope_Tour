@@ -1,6 +1,12 @@
+const isLocalHost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+const fallbackApiBaseUrl = isLocalHost
+    ? "http://localhost:3000/api"
+    : `${window.location.origin}/api`;
 const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL)
     || window.BASE_URL
-    || "http://localhost:3000/api";
+    || fallbackApiBaseUrl;
 
 document.querySelector(".btn-sign-up").addEventListener("click", async (event) => {
     event.preventDefault(); // Ngăn chặn gửi form nếu có lỗi
