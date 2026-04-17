@@ -15,12 +15,25 @@ const userProfileRoute = require('./routes/user_profile_route');
 const joinRoute = require('./routes/join_route');
 const invitationRoute = require('./routes/invitation_route');
 
+const parseFeatureToggle = (value, defaultValue = false) => {
+  if (typeof value === 'undefined') {
+    return defaultValue;
+  }
+
+  return String(value).trim().toLowerCase() === 'true';
+};
+
+const ENABLE_REDIS = parseFeatureToggle(process.env.ENABLE_REDIS, false);
+const ENABLE_RABBITMQ = parseFeatureToggle(process.env.ENABLE_RABBITMQ, false);
+
 // Middlewares
-const { warmTaskCache } = require('./middlewares/cache_warming');
-const redisClient = require('./utils/redis_client');
-const rabbitmqClient = require('./utils/rabbitmq_client');
+const { warmTaskCache } = ENABLE_REDIS
+  ? require('./middlewares/cache_warming')
+  : { warmTaskCache: async () => false };
+const redisClient = ENABLE_REDIS ? require('./utils/redis_client') : null;
+const rabbitmqClient = ENABLE_RABBITMQ ? require('./utils/rabbitmq_client') : null;
 const websocketHandler = require('./utils/websocket_handler');
-const taskConsumer = require('./consumers/task_consumer');
+const taskConsumer = ENABLE_RABBITMQ ? require('./consumers/task_consumer') : null;
 const databaseMonitor = require('./utils/database_monitor');
 
 const app = express();
@@ -78,14 +91,22 @@ const initializeServices = async () => {
     // Connect to database
     await sequelize.authenticate();
     console.log('✅ Database connection established.');
-    
-    // Connect to RabbitMQ
-    await rabbitmqClient.connect();
-    console.log('✅ RabbitMQ connection established.');
-    
-    // Start task consumer
-    await taskConsumer.startConsuming();
-    console.log('✅ Task consumer started.');
+
+    if (ENABLE_RABBITMQ && rabbitmqClient && taskConsumer) {
+      // Connect to RabbitMQ
+      await rabbitmqClient.connect();
+      console.log('✅ RabbitMQ connection established.');
+
+      // Start task consumer
+      await taskConsumer.startConsuming();
+      console.log('✅ Task consumer started.');
+    } else {
+      console.log('⏸ RabbitMQ is disabled (ENABLE_RABBITMQ=false). Task queue is running in direct DB fallback mode.');
+    }
+
+    if (!ENABLE_REDIS) {
+      console.log('⏸ Redis is disabled (ENABLE_REDIS=false). Cache warming is skipped.');
+    }
     
   } catch (err) {
     console.error('❌ Service initialization failed:', err);
@@ -93,37 +114,39 @@ const initializeServices = async () => {
 };
 
 // When Redis is ready, warm up cache for important teams and subjects
-redisClient.on('connect', async () => {
-  console.log('✅ Redis connected - starting cache warming');
-  
-  // Add your most active teams and subjects here
-  const importantData = [
-    { teamId: 1, subjectId: 1 },
-    { teamId: 2, subjectId: 2 }
-    // Add more as needed
-  ];
-  
-  for (const { teamId, subjectId } of importantData) {
-    await warmTaskCache(teamId, subjectId);
-  }
-});
+if (ENABLE_REDIS && redisClient) {
+  redisClient.on('connect', async () => {
+    console.log('✅ Redis connected - starting cache warming');
 
-// Periodically rewarm cache
-const CACHE_REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes
-setInterval(async () => {
-  if (redisClient.isReady) {
-    console.log('⏳ Refreshing cache...');
+    // Add your most active teams and subjects here
     const importantData = [
       { teamId: 1, subjectId: 1 },
       { teamId: 2, subjectId: 2 }
       // Add more as needed
     ];
-    
+
     for (const { teamId, subjectId } of importantData) {
       await warmTaskCache(teamId, subjectId);
     }
-  }
-}, CACHE_REFRESH_INTERVAL);
+  });
+
+  // Periodically rewarm cache
+  const CACHE_REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes
+  setInterval(async () => {
+    if (redisClient.isReady) {
+      console.log('⏳ Refreshing cache...');
+      const importantData = [
+        { teamId: 1, subjectId: 1 },
+        { teamId: 2, subjectId: 2 }
+        // Add more as needed
+      ];
+
+      for (const { teamId, subjectId } of importantData) {
+        await warmTaskCache(teamId, subjectId);
+      }
+    }
+  }, CACHE_REFRESH_INTERVAL);
+}
 
 // Initialize WebSocket
 websocketHandler.initialize(server);

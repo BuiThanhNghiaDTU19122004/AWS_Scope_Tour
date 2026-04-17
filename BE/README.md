@@ -13,6 +13,18 @@
 4. Start worker (optional, second terminal):
    - `npm run worker`
 
+## Iterative Deployment Mode (Recommended)
+- For basic CRUD validation on cloud, keep these toggles off:
+   - `ENABLE_RABBITMQ=false`
+   - `ENABLE_REDIS=false`
+- Result:
+   - API works in direct database fallback mode.
+   - Queue worker startup is skipped.
+   - Redis cache warming is skipped.
+- After CRUD is stable, turn them back on:
+   - `ENABLE_RABBITMQ=true`
+   - `ENABLE_REDIS=true`
+
 ## AWS target
 - Deploy to EC2/ECS/App Runner/Lambda container.
 - Store sensitive values in AWS Secrets Manager or SSM Parameter Store.

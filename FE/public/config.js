@@ -6,8 +6,8 @@
 
     // Đã cập nhật DNS của AWS Application Load Balancer
     // Lưu ý: Tạm thời dùng http://, xem cảnh báo bên dưới
-    const deployApiBaseUrl = "http://scopetour-alb-2062935477.ap-southeast-1.elb.amazonaws.com/api";
-    const deploySocketBaseUrl = "http://scopetour-alb-2062935477.ap-southeast-1.elb.amazonaws.com";
+    const deployApiBaseUrl = "https://d2ja0553fgapih.cloudfront.net/api";
+    const deploySocketBaseUrl = "https://d2ja0553fgapih.cloudfront.net";
 
     const defaultApiBaseUrl = isLocalHost
         ? "http://localhost:3000/api"

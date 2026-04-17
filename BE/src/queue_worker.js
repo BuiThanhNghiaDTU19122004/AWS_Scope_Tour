@@ -4,15 +4,26 @@ require('dotenv').config({
   path: path.join(__dirname, '../.env') 
 });
 
-const rabbitmqClient = require('./utils/rabbitmq_client');
-const taskConsumer = require('./consumers/task_consumer');
-const sequelize = require('./config/database');
+const ENABLE_RABBITMQ = String(process.env.ENABLE_RABBITMQ || '').trim().toLowerCase() === 'true';
 
-// Load associations
-require('./models/associations');
+let rabbitmqClient;
+let taskConsumer;
+let sequelize;
 
 async function startWorker() {
   console.log('🚀 Starting queue worker...');
+
+  if (!ENABLE_RABBITMQ) {
+    console.log('⏸ Queue worker is disabled (ENABLE_RABBITMQ=false).');
+    process.exit(0);
+  }
+
+  rabbitmqClient = require('./utils/rabbitmq_client');
+  taskConsumer = require('./consumers/task_consumer');
+  sequelize = require('./config/database');
+
+  // Load associations only when worker is enabled.
+  require('./models/associations');
   
   try {
     // Try to connect to database
